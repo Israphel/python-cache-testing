@@ -19,24 +19,43 @@ jobs:
         with:
           python-version: '3.8'
 
+      # - name: Cache venv
+      #   uses: actions/cache@v2
+      #   id: cache-venv
+      #   with:
+      #     path: .venv
+      #     key: ${{ runner.os }}-venv-${{ hashFiles('requirements/common.txt') }}-${{ hashFiles('requirements/dev.txt') }}
+      #     restore-keys: ${{ runner.os }}-venv-
+
       - name: Cache venv
-        uses: actions/cache@v2
+        uses: syphar/restore-virtualenv@v1.2
         id: cache-venv
         with:
-          path: .venv
-          key: ${{ runner.os }}-venv-${{ hashFiles('requirements/common.txt') }}-${{ hashFiles('requirements/dev.txt') }}
-          restore-keys: ${{ runner.os }}-venv-
+          requirement_files: requirements/*.txt
+
+      - name: Restore pip cache
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        uses: syphar/restore-pip-download-cache@v1
 
       - name: Install test dependencies
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
-          python3 -m venv .venv
-          ./.venv/bin/activate
           pip3 install -r requirements/common.txt
           pip3 install -r requirements/dev.txt
 
-      - name: Validate
-        run: |
-          python3 -m venv .venv
-          ./.venv/bin/activate
-          yamllint .
+      - name: YAML Lint
+        run: yamllint .
+
+      # - name: Install test dependencies
+      #   if: steps.cache-venv.outputs.cache-hit != 'true'
+      #   run: |
+      #     python3 -m venv .venv
+      #     ./.venv/bin/activate
+      #     pip3 install -r requirements/common.txt
+      #     pip3 install -r requirements/dev.txt
+      #
+      # - name: Validate
+      #   run: |
+      #     python3 -m venv .venv
+      #     ./.venv/bin/activate
+      #     yamllint .
