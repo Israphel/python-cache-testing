@@ -3,7 +3,8 @@ name: ci
 
 on:
   push:
-    - main
+    branches:
+      - main
 
 jobs:
   lint:
