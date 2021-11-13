@@ -23,13 +23,17 @@ jobs:
         uses: syphar/restore-virtualenv@v1.2
         id: cache-venv
         with:
-          requirement_files: requirements/*.txt
+          requirement_files: |
+            requirements/common.txt
+            requirements/dev.txt
 
       - name: Restore pip cache
         if: steps.cache-venv.outputs.cache-hit != 'true'
         uses: syphar/restore-pip-download-cache@v1
         with:
-          requirement_files: requirements/*.txt
+          requirement_files: |
+            requirements/common.txt
+            requirements/dev.txt
 
       - name: Install dependencies
         if: steps.cache-venv.outputs.cache-hit != 'true'
